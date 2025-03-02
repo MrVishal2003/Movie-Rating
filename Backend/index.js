@@ -14,16 +14,17 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: ["https://movie-rating-flax.vercel.app/"], // Replace with your frontend URL
-    methods: ["GET", "POST"],
+    origin: ["https://movie-rating-flax.vercel.app"], // Replace with your frontend URL
+    methods: ["GET", "POST", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-// MongoDB Connection
-mongoose
-  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("MongoDB Connected"))
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => console.log("MongoDB Connected"))
   .catch((err) => console.error("MongoDB Connection Error:", err));
 
 // Middleware for authentication
@@ -38,7 +39,7 @@ const authenticateUser = (req, res, next) => {
   });
 };
 
-// Admin Routes
+// Admin Route
 app.use("/admin", adminRoute);
 
 // User Signup
@@ -73,7 +74,11 @@ app.post("/signin", async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ userId: user.userId, username: user.username }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign(
+      { userId: user.userId, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
 
     res.status(200).json({ message: "Login successful", token, username: user.username, userId: user.userId });
   } catch (error) {
@@ -88,7 +93,19 @@ app.post("/showmore", authenticateUser, async (req, res) => {
     const { rating, moviename, comment, mediaType, mediaId, day, month, year } = req.body;
 
     const ratingId = (await RatingModel.countDocuments()) + 101;
-    const newRating = new RatingModel({ ratingId, userId: req.user.userId, username: req.user.username, rating, moviename, comment, mediaType, mediaId, day, month, year });
+    const newRating = new RatingModel({
+      ratingId,
+      userId: req.user.userId,
+      username: req.user.username,
+      rating,
+      moviename,
+      comment,
+      mediaType,
+      mediaId,
+      day,
+      month,
+      year
+    });
 
     await newRating.save();
     res.status(201).json({ message: "Rating saved successfully", ratingId });
@@ -115,5 +132,7 @@ app.get("/api/authenticated", authenticateUser, (req, res) => {
   res.json({ authenticated: true, user: req.user });
 });
 
-// Required for Vercel Deployment
+// Server Start
+app.listen(3000, () => console.log("Server running on port 3000"));
+
 export default app;
