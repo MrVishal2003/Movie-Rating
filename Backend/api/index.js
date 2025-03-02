@@ -4,15 +4,15 @@ import cors from "cors";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 
-import UserModel from "../models/Users.js";
-import RatingModel from "../models/Rating.js";
-import adminRoute from "../routes/admin.js";
+import UserModel from "./models/Users.js";
+import RatingModel from "./models/Rating.js";
+import adminRoute from "./routes/admin.js";
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: ["https://movie-rating-flax.vercel.app/"], credentials: true }));
+app.use(cors());
 
 app.use("/admin", adminRoute);
 
@@ -23,7 +23,7 @@ mongoose
   .catch((err) => console.error("❌ MongoDB error:", err));
 
 app.get("/", (req, res) => {
-  res.send("🚀 Express API running on Vercel!");
+  res.send("🚀 Express API running!");
 });
 
 /* =======================
@@ -100,4 +100,7 @@ app.get("/ratings", async (req, res) => {
   }
 });
 
-export default app;
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+});
