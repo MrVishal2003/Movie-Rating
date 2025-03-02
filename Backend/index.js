@@ -20,10 +20,11 @@ app.use(
   })
 );
 
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+// MongoDB Connection
+mongoose
+  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error("MongoDB Connection Error:", err));
 
 // Middleware for authentication
 const authenticateUser = (req, res, next) => {
@@ -37,15 +38,13 @@ const authenticateUser = (req, res, next) => {
   });
 };
 
-// Admin Route
+// Admin Routes
 app.use("/admin", adminRoute);
 
 // User Signup
 app.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
-
-    // Check if user already exists
     if (await UserModel.findOne({ email })) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -74,7 +73,6 @@ app.post("/signin", async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Generate JWT token
     const token = jwt.sign({ userId: user.userId, username: user.username }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
     res.status(200).json({ message: "Login successful", token, username: user.username, userId: user.userId });
@@ -117,7 +115,5 @@ app.get("/api/authenticated", authenticateUser, (req, res) => {
   res.json({ authenticated: true, user: req.user });
 });
 
-// Start Server
-app.listen(3000, () => console.log("Server running on port 3000"));
-
+// Required for Vercel Deployment
 export default app;
