@@ -15,7 +15,7 @@ app.listen(3000, () => {
   console.log("Server started on port 3000");
 });
 
-mongoose.connect("mongodb://localhost:27017/Movie", {
+mongoose.connect("mongodb+srv://hadiyal123vvv:vishal1211@hms.aylr5.mongodb.net/?retryWrites=true&w=majority&appName=hms", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
