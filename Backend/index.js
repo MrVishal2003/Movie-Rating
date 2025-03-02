@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: ["https://yourfrontend.com"], // Replace with your frontend URL
+    origin: ["https://movie-rating-flax.vercel.app/"], // Replace with your frontend URL
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
