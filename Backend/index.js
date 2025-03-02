@@ -1,10 +1,10 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-import UserModel from "./models/Users.js";
+import UserModel from "../models/Users.js";
 import bcrypt from "bcrypt";
-import RatingModel from "./models/Rating.js";
-import adminRoute from "./routes/admin.js";
+import RatingModel from "../models/Rating.js";
+import adminRoute from "../routes/admin.js";
 
 const app = express();
 app.use(express.json());
