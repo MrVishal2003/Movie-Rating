@@ -1,83 +1,111 @@
-import dotenv from "dotenv";
-dotenv.config(); // Load environment variables first
-
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import UserModel from "./models/Users.js";
 import bcrypt from "bcrypt";
-
-import UserModel from "./models/Users.js"; // ✅ Corrected paths
-import RatingModel from "./models/Rating.js"; // ✅ Corrected paths
-import adminRoute from "./routes/admin.js"; // ✅ Corrected paths
+import RatingModel from "./models/Rating.js";
+import adminRoute from "./routes/admin.js";
 
 const app = express();
 app.use(express.json());
-
-// ✅ Configure CORS properly for Vercel
-app.use(cors({
-  origin: process.env.CLIENT_URL || "https://movie-rating-flax.vercel.app", 
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
-}));
-
+app.use(cors());
 app.use("/admin", adminRoute);
 
-app.get("/", (req, res) => {
-  res.send("Server is running on Vercel!");
+app.listen(3000, () => {
+  console.log("Server started on port 3000");
 });
 
-// ✅ MongoDB Connection
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
+mongoose.connect("mongodb://localhost:27017/myDatabase", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-// 🔹 Signup Route
 app.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
+
+    // Check if any users exist in the database
     const existingUsers = await UserModel.find();
-    let userId = existingUsers.length === 0 ? 1 : Math.max(...existingUsers.map(user => user.userId)) + 1;
-
+    let userId;
+    if (existingUsers.length === 0) {
+      userId = 1;
+    } else {
+      const maxUserId = Math.max(...existingUsers.map((user) => user.userId));
+      userId = maxUserId + 1;
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new UserModel({ username, email, password: hashedPassword, userId });
 
+    const newUser = new UserModel({
+      username,
+      email,
+      password: hashedPassword,
+      userId,
+    });
     await newUser.save();
+
     res.status(201).json({ message: "User created successfully", userId });
   } catch (error) {
-    console.error("Signup error:", error);
+    console.error("Error signing up user:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
 
-// 🔹 Sign-in Route
 app.post("/signin", async (req, res) => {
   try {
     const { email, password } = req.body;
+
     const user = await UserModel.findOne({ email });
-
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
+    } else {
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      res.status(200).json({
+        message: "Login successful",
+        username: user.username,
+        userId: user.userId,
+      });
     }
-
-    res.status(200).json({
-      message: "Login successful",
-      username: user.username,
-      userId: user.userId,
-    });
   } catch (error) {
-    console.error("Signin error:", error);
+    console.error("Error logging in user:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
 
-// 🔹 Save Rating Route
 app.post("/showmore", async (req, res) => {
   try {
-    const ratingId = (await RatingModel.countDocuments()) + 101;
-    const newRating = new RatingModel({ ...req.body, ratingId });
+    const {
+      userId,
+      username,
+      rating,
+      moviename,
+      comment,
+      mediaType,
+      mediaId,
+      day,
+      month,
+      year,
+    } = req.body;
 
+    const ratingId = (await RatingModel.countDocuments()) + 101;
+
+    const newRating = new RatingModel({
+      ratingId,
+      userId,
+      username,
+      rating,
+      moviename,
+      comment,
+      mediaType,
+      mediaId,
+      day,
+      month,
+      year,
+    });
     await newRating.save();
+
     res.status(201).json({ message: "Rating saved successfully", ratingId });
   } catch (error) {
     console.error("Error saving rating:", error);
@@ -85,12 +113,16 @@ app.post("/showmore", async (req, res) => {
   }
 });
 
-// 🔹 Authentication Check
-app.get("/api/authenticated", (req, res) => {
-  res.json({ authenticated: true });
+app.get("/api/authenticated", async (req, res) => {
+  try {
+    const authenticated = true;
+    res.json({ authenticated });
+  } catch (error) {
+    console.error("Error checking authentication:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
-// 🔹 Get Ratings
 app.get("/ratings", async (req, res) => {
   try {
     const { mediaId } = req.query;
@@ -101,6 +133,3 @@ app.get("/ratings", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-// ✅ Export app for Vercel (No `app.listen()`)
-export default app;
