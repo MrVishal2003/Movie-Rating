@@ -9,8 +9,6 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
 
-const BASE_URL = "https://backend-ten-self-34.vercel.app"; // ✅ Your Backend URL
-
 function SignIn() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -18,7 +16,7 @@ function SignIn() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        axios.post(`${BASE_URL}/signin`, { email, password })
+        axios.post("http://localhost:3000/signin", { email, password })
             .then(response => {
                 if (response.status === 200) {
                     localStorage.setItem('isLoggedIn', 'true');
@@ -44,18 +42,18 @@ function SignIn() {
                 <form className="flex flex-col items-center" onSubmit={handleSubmit}>
                     <div className="mb-8 relative">
                         <EmailIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-yellow_default" />
-                        <input placeholder="Email" type="email" id="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-transparent w-[340px] px-3 py-2 border-[2px] rounded-md text-white focus:outline-none focus:border-yellow-500 text-center" required />
+                        <input placeholder="Email" type="email" id="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-transparent w-[340px] px-3 py-2 border-[2px] rounded-md text-white focus:outline-none focus:border-yellow-500 text-center" />
                     </div>
                     <div className="mb-8 relative">
                         <VpnKeyIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-yellow_default" />
-                        <input placeholder="Password" type="password" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-transparent w-[340px] px-3 py-2 border-[2px] rounded-md text-white focus:outline-none focus:border-yellow-500 text-center" required />
+                        <input placeholder="Password" type="password" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-transparent w-[340px] px-3 py-2 border-[2px] rounded-md text-white focus:outline-none focus:border-yellow-500 text-center" />
                     </div>
                     <div className="mb-5 flex items-center">
                         <Checkbox sx={{ color: yellow[500], '&.Mui-checked': { color: yellow[500], }, }} />
                         <label htmlFor="remember" className="text-sm">Remember me</label>
                     </div>
                     <div className="mb-5 text-center">
-                        <p className="text-sm">Don&apos;t Have an Account? <NavLink to="/signup" className="text-yellow_default ml-2">Sign Up</NavLink></p>
+                        <p className="text-sm">Don&apos;t Have any Account? <NavLink to="/signup" className="text-yellow_default ml-2">Sign Up</NavLink></p>
                     </div>
                     <div className="mb-[100px]">
                         <Button name='SIGN IN' bgColor='yellow_default' textColor='black' />

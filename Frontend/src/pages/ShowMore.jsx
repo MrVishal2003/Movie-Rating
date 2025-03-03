@@ -27,8 +27,6 @@ function ShowMore() {
     const [reviews, setReviews] = useState([]);
     const navigate = useNavigate();
 
-    const BASE_URL = "https://backend-ten-self-34.vercel.app"; // ✅ Your Backend URL
-
     useEffect(() => {
         const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
         if (!loggedIn) {
@@ -37,7 +35,7 @@ function ShowMore() {
     }, [navigate]);
 
     useEffect(() => {
-        axios.get(`${BASE_URL}/ratings`, {
+        axios.get('http://localhost:3000/ratings', {
             params: {
                 mediaId: id
             }
@@ -87,7 +85,7 @@ function ShowMore() {
             const currentMonth = `${currentDate.toLocaleString('default', { month: 'long' })}`;
             const currentYear = `${currentDate.getFullYear()}`;
 
-            await axios.post(`${BASE_URL}/showmore`, {
+            await axios.post('http://localhost:3000/showmore', {
                 userId: userId,
                 username: username,
                 rating: rating,
@@ -100,7 +98,7 @@ function ShowMore() {
                 year: currentYear
             });
 
-            const response = await axios.get(`${BASE_URL}/ratings?mediaId=${id}`);
+            const response = await axios.get(`http://localhost:3000/ratings?mediaId=${id}`);
             setReviews(response.data);
 
             handleClose();

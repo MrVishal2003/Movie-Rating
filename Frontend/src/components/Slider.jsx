@@ -2,7 +2,7 @@ import { Carousel } from 'antd';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useState, useEffect } from "react";
-import Button from './Button';
+import Button from '../components/Button';
 import { Star } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
