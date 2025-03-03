@@ -8,7 +8,7 @@ import bcrypt from "bcrypt";
 
 import UserModel from "./models/Users.js"; // ✅ Fixed path
 import RatingModel from "./models/Rating.js"; // ✅ Fixed path
-import adminRoute from "./routes/admin.js"; // ✅ Fixed path
+import adminRoute from "./routes/admin.js";  // ✅ Fixed path
 
 const app = express();
 app.use(express.json());
