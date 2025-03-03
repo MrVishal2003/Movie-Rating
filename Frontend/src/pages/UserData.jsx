@@ -11,7 +11,7 @@ function UserData() {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`https://backend-1h15n602z-mrvishal2003s-projects.vercel.app/admin/users/${userId}`)
+        axios.get(`https://backend-ten-self-34.vercel.app/admin/users/${userId}`)
             .then(response => {
                 setUserData(response.data);
             })
@@ -25,8 +25,8 @@ function UserData() {
 
     const handleRemoveRating = async (ratingId) => {
         try {
-            await axios.delete(`https://backend-1h15n602z-mrvishal2003s-projects.vercel.app/admin/ratings/${ratingId}`);
-            axios.get(`https://backend-1h15n602z-mrvishal2003s-projects.vercel.app/admin/users/${userId}`)
+            await axios.delete(`https://backend-ten-self-34.vercel.app/admin/ratings/${ratingId}`);
+            axios.get(`https://backend-ten-self-34.vercel.app/admin/users/${userId}`)
                 .then(response => {
                     setUserData(response.data);
                 })
