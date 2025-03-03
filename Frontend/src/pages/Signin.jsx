@@ -16,7 +16,7 @@ function SignIn() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        axios.post("https://movie-rating-backend-ten.vercel.app/signin", { email, password })
+        axios.post("https://backend-1h15n602z-mrvishal2003s-projects.vercel.app/signin", { email, password })
             .then(response => {
                 if (response.status === 200) {
                     localStorage.setItem('isLoggedIn', 'true');

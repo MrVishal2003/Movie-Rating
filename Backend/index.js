@@ -1,22 +1,21 @@
+import dotenv from "dotenv";
+dotenv.config(); // Load environment variables first
+
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import bcrypt from "bcrypt";
-import dotenv from "dotenv";
 
-import UserModel from "./models/Users.js";
-
-import RatingModel from "../models/Rating.js";
-import adminRoute from "../routes/admin.js";
-
-dotenv.config(); // Load environment variables
+import UserModel from "./models/Users.js"; // ✅ Fixed path
+import RatingModel from "./models/Rating.js"; // ✅ Fixed path
+import adminRoute from "./routes/admin.js"; // ✅ Fixed path
 
 const app = express();
 app.use(express.json());
 
 // ✅ Configure CORS properly for Vercel
 app.use(cors({
-  origin: process.env.CLIENT_URL || "https://movie-rating-flax.vercel.app/", // Allow frontend URL
+  origin: process.env.CLIENT_URL || "https://movie-rating-flax.vercel.app", 
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
@@ -25,17 +24,13 @@ app.use(cors({
 app.use("/admin", adminRoute);
 
 app.get("/", (req, res) => {
-  res.send("API is running...");
+  res.send("Server is running!");
 });
 
-// MongoDB Connection (use environment variables)
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+// ✅ Fix MongoDB Connection
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
 // Signup Route
 app.post("/signup", async (req, res) => {

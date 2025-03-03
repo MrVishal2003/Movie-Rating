@@ -35,7 +35,7 @@ function ShowMore() {
     }, [navigate]);
 
     useEffect(() => {
-        axios.get('https://movie-rating-backend-ten.vercel.app/ratings', {
+        axios.get('https://backend-1h15n602z-mrvishal2003s-projects.vercel.app/ratings', {
             params: {
                 mediaId: id
             }
@@ -47,7 +47,7 @@ function ShowMore() {
     }, [id]);
 
     // useEffect(() => {
-    //     axios.get('https://movie-rating-backend-ten.vercel.app/userdata')
+    //     axios.get('https://backend-1h15n602z-mrvishal2003s-projects.vercel.app/userdata')
     //         .then(response => {
     //             const userData = response.data;
     //             const user = userData.find(user => user.username === username);
@@ -85,7 +85,7 @@ function ShowMore() {
             const currentMonth = `${currentDate.toLocaleString('default', { month: 'long' })}`;
             const currentYear = `${currentDate.getFullYear()}`;
 
-            await axios.post('https://movie-rating-backend-ten.vercel.app/showmore', {
+            await axios.post('https://backend-1h15n602z-mrvishal2003s-projects.vercel.app/showmore', {
                 userId: userId,
                 username: username,
                 rating: rating,
@@ -98,7 +98,7 @@ function ShowMore() {
                 year: currentYear
             });
 
-            const response = await axios.get(`https://movie-rating-backend-ten.vercel.app/ratings?mediaId=${id}`);
+            const response = await axios.get(`https://backend-1h15n602z-mrvishal2003s-projects.vercel.app/ratings?mediaId=${id}`);
             setReviews(response.data);
 
             handleClose();

@@ -8,7 +8,7 @@ function Admin() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('https://movie-rating-backend-ten.vercel.app/admin/users')
+        axios.get('https://backend-1h15n602z-mrvishal2003s-projects.vercel.app/admin/users')
             .then(response => {
                 setUsers(response.data);
             })
@@ -22,7 +22,7 @@ function Admin() {
     };
 
     const handleDelete = (userId) => {
-        axios.delete(`https://movie-rating-backend-ten.vercel.app/admin/users/${userId}`)
+        axios.delete(`https://backend-1h15n602z-mrvishal2003s-projects.vercel.app/admin/users/${userId}`)
             .then(response => {
                 console.log('User deleted successfully');
                 console.log(response);
