@@ -4,7 +4,8 @@ import cors from "cors";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 
-import UserModel from "../models/Users.js";
+import UserModel from "./models/Users.js";
+
 import RatingModel from "../models/Rating.js";
 import adminRoute from "../routes/admin.js";
 
