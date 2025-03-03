@@ -6,9 +6,9 @@ import mongoose from "mongoose";
 import cors from "cors";
 import bcrypt from "bcrypt";
 
-import UserModel from "./models/Users.js"; // ✅ Fixed path
-import RatingModel from "./models/Rating.js"; // ✅ Fixed path
-import adminRoute from "./routes/admin.js";  // ✅ Fixed path
+import UserModel from "./models/Users.js"; // ✅ Corrected paths
+import RatingModel from "./models/Rating.js"; // ✅ Corrected paths
+import adminRoute from "./routes/admin.js"; // ✅ Corrected paths
 
 const app = express();
 app.use(express.json());
@@ -24,15 +24,15 @@ app.use(cors({
 app.use("/admin", adminRoute);
 
 app.get("/", (req, res) => {
-  res.send("Server is running!");
+  res.send("Server is running on Vercel!");
 });
 
-// ✅ Fix MongoDB Connection
+// ✅ MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
-// Signup Route
+// 🔹 Signup Route
 app.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -50,7 +50,7 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-// Sign-in Route
+// 🔹 Sign-in Route
 app.post("/signin", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -71,7 +71,7 @@ app.post("/signin", async (req, res) => {
   }
 });
 
-// Save Rating Route
+// 🔹 Save Rating Route
 app.post("/showmore", async (req, res) => {
   try {
     const ratingId = (await RatingModel.countDocuments()) + 101;
@@ -85,12 +85,12 @@ app.post("/showmore", async (req, res) => {
   }
 });
 
-// Authentication Check
+// 🔹 Authentication Check
 app.get("/api/authenticated", (req, res) => {
   res.json({ authenticated: true });
 });
 
-// Get Ratings
+// 🔹 Get Ratings
 app.get("/ratings", async (req, res) => {
   try {
     const { mediaId } = req.query;
@@ -102,5 +102,5 @@ app.get("/ratings", async (req, res) => {
   }
 });
 
-// **Export app for Vercel**
+// ✅ Export app for Vercel (No `app.listen()`)
 export default app;
