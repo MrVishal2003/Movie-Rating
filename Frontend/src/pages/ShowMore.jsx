@@ -35,7 +35,7 @@ function ShowMore() {
     }, [navigate]);
 
     useEffect(() => {
-        axios.get('https://backend-ten-self-34.vercel.app/ratings', {
+        axios.get('http://localhost:3000/ratings', {
             params: {
                 mediaId: id
             }
@@ -47,7 +47,7 @@ function ShowMore() {
     }, [id]);
 
     // useEffect(() => {
-    //     axios.get('https://backend-ten-self-34.vercel.app/userdata')
+    //     axios.get('http://localhost:3000/userdata')
     //         .then(response => {
     //             const userData = response.data;
     //             const user = userData.find(user => user.username === username);
@@ -85,7 +85,7 @@ function ShowMore() {
             const currentMonth = `${currentDate.toLocaleString('default', { month: 'long' })}`;
             const currentYear = `${currentDate.getFullYear()}`;
 
-            await axios.post('https://backend-ten-self-34.vercel.app/showmore', {
+            await axios.post('http://localhost:3000/showmore', {
                 userId: userId,
                 username: username,
                 rating: rating,
@@ -98,7 +98,7 @@ function ShowMore() {
                 year: currentYear
             });
 
-            const response = await axios.get(`https://backend-ten-self-34.vercel.app/ratings?mediaId=${id}`);
+            const response = await axios.get(`http://localhost:3000/ratings?mediaId=${id}`);
             setReviews(response.data);
 
             handleClose();
