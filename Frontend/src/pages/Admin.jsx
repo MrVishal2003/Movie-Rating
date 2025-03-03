@@ -7,8 +7,10 @@ function Admin() {
     const [users, setUsers] = useState([]);
     const navigate = useNavigate();
 
+    const BASE_URL = "https://backend-ten-self-34.vercel.app"; // ✅ Your Backend URL
+
     useEffect(() => {
-        axios.get('http://localhost:3000/admin/users')
+        axios.get(`${BASE_URL}/admin/users`)
             .then(response => {
                 setUsers(response.data);
             })
@@ -22,7 +24,7 @@ function Admin() {
     };
 
     const handleDelete = (userId) => {
-        axios.delete(`http://localhost:3000/admin/users/${userId}`)
+        axios.delete(`${BASE_URL}/admin/users/${userId}`)
             .then(response => {
                 console.log('User deleted successfully');
                 console.log(response);
