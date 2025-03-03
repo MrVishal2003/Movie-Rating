@@ -11,7 +11,7 @@ function UserData() {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:3000/admin/users/${userId}`)
+        axios.get(`https://movie-rating-backend-ten.vercel.app/admin/users/${userId}`)
             .then(response => {
                 setUserData(response.data);
             })
@@ -25,8 +25,8 @@ function UserData() {
 
     const handleRemoveRating = async (ratingId) => {
         try {
-            await axios.delete(`http://localhost:3000/admin/ratings/${ratingId}`);
-            axios.get(`http://localhost:3000/admin/users/${userId}`)
+            await axios.delete(`https://movie-rating-backend-ten.vercel.app/admin/ratings/${ratingId}`);
+            axios.get(`https://movie-rating-backend-ten.vercel.app/admin/users/${userId}`)
                 .then(response => {
                     setUserData(response.data);
                 })
