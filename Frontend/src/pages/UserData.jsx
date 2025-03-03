@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Star } from "@mui/icons-material";
 
+const BASE_URL = "https://backend-ten-self-34.vercel.app"; // ✅ Your actual backend URL
+
 function UserData() {
     const { userId } = useParams();
     const [userData, setUserData] = useState(null);
@@ -11,7 +13,7 @@ function UserData() {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:3000/admin/users/${userId}`)
+        axios.get(`${BASE_URL}/admin/users/${userId}`)
             .then(response => {
                 setUserData(response.data);
             })
@@ -25,8 +27,8 @@ function UserData() {
 
     const handleRemoveRating = async (ratingId) => {
         try {
-            await axios.delete(`http://localhost:3000/admin/ratings/${ratingId}`);
-            axios.get(`http://localhost:3000/admin/users/${userId}`)
+            await axios.delete(`${BASE_URL}/admin/ratings/${ratingId}`);
+            axios.get(`${BASE_URL}/admin/users/${userId}`)
                 .then(response => {
                     setUserData(response.data);
                 })
@@ -89,36 +91,33 @@ function UserData() {
                     </div>
                 </div>
                 {ratings.map(review => (
-                    <>
-                        <div className='flex justify-between' key={review._id}>
-                            <div>
-                                <div className='flex'>
-                                    <div className='font-bold text-[17px] mr-20'>
-                                        {review.moviename}
-                                    </div>
-                                    <div className='text-[14px] text-gray-400 mb-3'>
-                                        {`${review.day} ${review.month}, ${review.year}`}
-                                    </div>
+                    <div className='flex justify-between' key={review._id}>
+                        <div>
+                            <div className='flex'>
+                                <div className='font-bold text-[17px] mr-20'>
+                                    {review.moviename}
                                 </div>
-                                <div className='flex mb-4'>
-                                    {[...Array(10)].map((_, index) => (
-                                        <Star key={index} className={index < review.rating ? "text-yellow-400 " : "text-gray-400"} style={{ fontSize: '18px' }} />
-                                    ))}
-                                </div>
-                                <div className='mb-2'>
-                                    {review.comment}
+                                <div className='text-[14px] text-gray-400 mb-3'>
+                                    {`${review.day} ${review.month}, ${review.year}`}
                                 </div>
                             </div>
-                            <div className="flex items-center">
-                                <div onClick={() => handleRemoveRating(review.ratingId)}>
-                                    <button type="submit" className="bg-blue-600 text-white h-[33px] w-[160px] font-bold rounded-[4px] flex justify-center items-center text-[13px]">
-                                        REMOVE
-                                    </button>
-                                </div>
+                            <div className='flex mb-4'>
+                                {[...Array(10)].map((_, index) => (
+                                    <Star key={index} className={index < review.rating ? "text-yellow-400 " : "text-gray-400"} style={{ fontSize: '18px' }} />
+                                ))}
+                            </div>
+                            <div className='mb-2'>
+                                {review.comment}
                             </div>
                         </div>
-                        <hr className='mb-10' />
-                    </>
+                        <div className="flex items-center">
+                            <div onClick={() => handleRemoveRating(review.ratingId)}>
+                                <button type="submit" className="bg-blue-600 text-white h-[33px] w-[160px] font-bold rounded-[4px] flex justify-center items-center text-[13px]">
+                                    REMOVE
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 ))}
             </div>
         </>
