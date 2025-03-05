@@ -44,34 +44,12 @@ router.delete("/users/:userId", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Delete user
     await UserModel.deleteOne({ userId });
-
-    // Delete user's ratings
     await RatingModel.deleteMany({ userId });
 
     res.status(200).json({ message: "User and their ratings deleted successfully" });
   } catch (error) {
     console.error("Error deleting user:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-// ✅ Delete Rating by ID
-router.delete("/ratings/:ratingId", async (req, res) => {
-  try {
-    const ratingId = Number(req.params.ratingId);
-    const rating = await RatingModel.findOne({ ratingId });
-
-    if (!rating) {
-      return res.status(404).json({ message: "Rating not found" });
-    }
-
-    await RatingModel.deleteOne({ ratingId });
-
-    res.status(200).json({ message: "Rating entry deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting rating entry:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
