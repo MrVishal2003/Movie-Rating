@@ -11,18 +11,22 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ Connect to MongoDB Atlas
+// ✅ MongoDB Connection with Logging
+mongoose.set("strictQuery", false);
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log("✅ Connected to MongoDB Atlas"))
-  .catch((error) => console.error("❌ MongoDB connection error:", error));
+  .then(() => console.log("✅ MongoDB Connected Successfully!"))
+  .catch((err) => {
+    console.error("❌ MongoDB Connection Error:", err);
+    process.exit(1); // Exit process if connection fails
+  });
 
 // ✅ Middleware
 app.use(express.json());
-app.use(cors({ origin: ["https://movie-rating-ui.vercel.app"], credentials: true }));
+app.use(cors({ origin: "*", credentials: true })); // Allow all origins temporarily for debugging
 
 // ✅ Routes
 app.use("/admin", adminRoute);
@@ -37,7 +41,10 @@ app.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    // Check if email already exists
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: "All fields are required!" });
+    }
+
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) return res.status(400).json({ message: "User already exists" });
 
@@ -45,7 +52,7 @@ app.post("/signup", async (req, res) => {
     const lastUser = await UserModel.findOne().sort({ userId: -1 });
     const userId = lastUser ? lastUser.userId + 1 : 1;
 
-    // Hash password and save user
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new UserModel({ username, email, password: hashedPassword, userId });
 
@@ -61,8 +68,9 @@ app.post("/signup", async (req, res) => {
 app.post("/signin", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await UserModel.findOne({ email });
+    if (!email || !password) return res.status(400).json({ message: "All fields are required!" });
 
+    const user = await UserModel.findOne({ email });
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -80,7 +88,10 @@ app.post("/showmore", async (req, res) => {
   try {
     const { userId, username, rating, moviename, comment, mediaType, mediaId, day, month, year } = req.body;
 
-    // Generate unique ratingId
+    if (!userId || !username || !rating || !moviename || !mediaId) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
     const lastRating = await RatingModel.findOne().sort({ ratingId: -1 });
     const ratingId = lastRating ? lastRating.ratingId + 1 : 101;
 
@@ -115,6 +126,8 @@ app.get("/api/authenticated", (req, res) => {
 app.get("/ratings", async (req, res) => {
   try {
     const { mediaId } = req.query;
+    if (!mediaId) return res.status(400).json({ message: "mediaId is required" });
+
     const ratings = await RatingModel.find({ mediaId });
     res.json(ratings);
   } catch (error) {
@@ -123,7 +136,9 @@ app.get("/ratings", async (req, res) => {
   }
 });
 
-// ✅ Start Server
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+// ✅ Start Server (For Local Testing)
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+}
 
 export default app;
