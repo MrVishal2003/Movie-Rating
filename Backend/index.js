@@ -1,57 +1,35 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-import dotenv from "dotenv";
-import bcrypt from "bcrypt";
 import UserModel from "./models/Users.js";
+import bcrypt from "bcrypt";
 import RatingModel from "./models/Rating.js";
 import adminRoute from "./routes/admin.js";
 
-dotenv.config();
-
 const app = express();
-
-// ✅ Middleware
 app.use(express.json());
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL, // Allow frontend domain
-    credentials: true,
-  })
-);
-
-// ✅ Routes
+app.use(cors());
 app.use("/admin", adminRoute);
 
-// ✅ Health Check Route (Root URL)
-app.get("/", (req, res) => {
-  res.status(200).json({ message: "🚀 Server is ready for use!" });
+// ✅ MongoDB Connection (Using Vercel Environment Variable)
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 5000, // Prevent long waits
+})
+.then(() => console.log("✅ Connected to MongoDB Atlas"))
+.catch((err) => {
+  console.error("❌ MongoDB Connection Error:", err);
+  process.exit(1);
 });
-
-// ✅ Connect to MongoDB Atlas
-mongoose
-  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log("✅ Connected to MongoDB Atlas");
-    console.log("🚀 Server is ready for use!");
-  })
-  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
 // ✅ Signup Route
 app.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
-
-    const existingUser = await UserModel.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "Email already registered" });
-    }
-
     const existingUsers = await UserModel.find();
-    const userId =
-      existingUsers.length === 0
-        ? 1
-        : Math.max(...existingUsers.map((user) => user.userId)) + 1;
+    
+    let userId = existingUsers.length === 0 ? 1 : Math.max(...existingUsers.map(user => user.userId)) + 1;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new UserModel({ username, email, password: hashedPassword, userId });
@@ -68,8 +46,8 @@ app.post("/signup", async (req, res) => {
 app.post("/signin", async (req, res) => {
   try {
     const { email, password } = req.body;
-
     const user = await UserModel.findOne({ email });
+
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -121,10 +99,6 @@ app.get("/api/authenticated", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
-// ✅ Start server locally (for local testing)
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
 
 // ✅ Export app for Vercel
 export default app;
