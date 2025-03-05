@@ -21,7 +21,7 @@ app.use(
   })
 );
 
-// ✅ MongoDB Atlas Connection
+// ✅ Connect to MongoDB outside request handlers
 const connectDB = async () => {
   if (mongoose.connection.readyState === 1) return;
   try {
@@ -32,11 +32,9 @@ const connectDB = async () => {
     console.log("✅ MongoDB Connected");
   } catch (error) {
     console.error("❌ MongoDB Connection Error:", error);
-    process.exit(1); // Exit if DB connection fails
   }
 };
-
-connectDB(); // Call the function to connect to MongoDB
+connectDB(); // Call on startup
 
 // ✅ API Routes
 app.use("/admin", adminRoute);
