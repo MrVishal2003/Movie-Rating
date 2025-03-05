@@ -10,18 +10,20 @@ import adminRoute from "./routes/admin.js";
 dotenv.config(); // Load environment variables
 
 const app = express();
-app.use(express.json());
+const PORT = process.env.PORT || 3000;
 
-// ✅ CORS Configuration (Allow only frontend domain)
+// ✅ Middleware
+app.use(express.json());
 app.use(
   cors({
-    origin: ["https://movie-rating-ui.vercel.app"],
+    origin: ["https://movie-rating-ui.vercel.app"], // Change this to match your frontend URL
     methods: ["GET", "POST", "DELETE"],
     credentials: true,
   })
 );
+app.use("/admin", adminRoute);
 
-// ✅ Connect to MongoDB outside request handlers
+// ✅ MongoDB Connection
 const connectDB = async () => {
   if (mongoose.connection.readyState === 1) return;
   try {
@@ -36,13 +38,12 @@ const connectDB = async () => {
 };
 connectDB(); // Call on startup
 
-// ✅ API Routes
-app.use("/admin", adminRoute);
-
+// ✅ Root Route
 app.get("/", (req, res) => {
-  res.send("✅ Backend is running successfully!");
+  res.send("🎬 Movie Rating API is running successfully!");
 });
 
+// ✅ Signup Route
 app.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -53,19 +54,15 @@ app.post("/signup", async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // Generate a new userId
-    const lastUser = await UserModel.findOne().sort({ userId: -1 });
-    const userId = lastUser ? lastUser.userId + 1 : 1;
+    // Generate user ID
+    const lastUser = await UserModel.findOne().sort({ userId: -1 }); // Get last user
+    const userId = lastUser ? lastUser.userId + 1 : 1; // Auto-increment userId
 
-    // Hash the password
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new UserModel({
-      username,
-      email,
-      password: hashedPassword,
-      userId,
-    });
+    // Save user
+    const newUser = new UserModel({ username, email, password: hashedPassword, userId });
     await newUser.save();
 
     res.status(201).json({ message: "User created successfully", userId });
@@ -75,6 +72,7 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+// ✅ Signin Route
 app.post("/signin", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -84,6 +82,7 @@ app.post("/signin", async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    // Compare password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid credentials" });
@@ -100,11 +99,25 @@ app.post("/signin", async (req, res) => {
   }
 });
 
+// ✅ Add Movie Rating
 app.post("/showmore", async (req, res) => {
   try {
-    const { userId, username, rating, moviename, comment, mediaType, mediaId, day, month, year } = req.body;
+    const {
+      userId,
+      username,
+      rating,
+      moviename,
+      comment,
+      mediaType,
+      mediaId,
+      day,
+      month,
+      year,
+    } = req.body;
 
-    const ratingId = (await RatingModel.countDocuments()) + 101;
+    // Generate rating ID
+    const lastRating = await RatingModel.findOne().sort({ ratingId: -1 });
+    const ratingId = lastRating ? lastRating.ratingId + 1 : 101; // Auto-increment ratingId
 
     const newRating = new RatingModel({
       ratingId,
@@ -119,8 +132,8 @@ app.post("/showmore", async (req, res) => {
       month,
       year,
     });
-    await newRating.save();
 
+    await newRating.save();
     res.status(201).json({ message: "Rating saved successfully", ratingId });
   } catch (error) {
     console.error("Error saving rating:", error);
@@ -128,6 +141,7 @@ app.post("/showmore", async (req, res) => {
   }
 });
 
+// ✅ Authentication Check Route
 app.get("/api/authenticated", async (req, res) => {
   try {
     res.json({ authenticated: true });
@@ -137,9 +151,14 @@ app.get("/api/authenticated", async (req, res) => {
   }
 });
 
+// ✅ Fetch Ratings for a Movie
 app.get("/ratings", async (req, res) => {
   try {
     const { mediaId } = req.query;
+    if (!mediaId) {
+      return res.status(400).json({ message: "Media ID is required" });
+    }
+
     const ratings = await RatingModel.find({ mediaId });
     res.json(ratings);
   } catch (error) {
@@ -148,10 +167,7 @@ app.get("/ratings", async (req, res) => {
   }
 });
 
-// ✅ Start Server Only if DB is Connected
-const PORT = process.env.PORT || 3000;
-mongoose.connection.once("open", () => {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-  });
-});
+// ✅ Start Server
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+export default app;
