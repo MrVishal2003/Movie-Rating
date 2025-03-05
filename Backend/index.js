@@ -26,7 +26,7 @@ mongoose
 
 // ✅ Middleware
 app.use(express.json());
-app.use(cors({ origin: "*", credentials: true })); // Allow all origins temporarily for debugging
+app.use(cors({ origin: ["https://movie-rating-ui.vercel.app"], credentials: true }));
 
 // ✅ Routes
 app.use("/admin", adminRoute);
