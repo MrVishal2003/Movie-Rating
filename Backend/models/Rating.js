@@ -46,6 +46,4 @@ const ratingSchema = new mongoose.Schema({
   },
 });
 
-const RatingModel = mongoose.model("Rating", ratingSchema);
-
-export default RatingModel;
+export default mongoose.model("Rating", RatingSchema);
