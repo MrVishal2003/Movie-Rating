@@ -7,8 +7,6 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 function SignUp() {
 
     const [username, setName] = useState();
@@ -18,7 +16,7 @@ function SignUp() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post(`${API_BASE_URL}/signup`, { username, email, password })
+        axios.post("http://localhost:3000/signup", { username, email, password })
             .then(response => {
                 if (response.status === 201) {
                     navigate('/signin');
