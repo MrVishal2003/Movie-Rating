@@ -34,8 +34,12 @@ function SignUp() {
                 window.location.reload();
             }
         } catch (error) {
-            if (error.response?.status === 400) {
-                setError("User already exists.");
+            console.error("❌ Signup Error:", error.response?.data || error.message);
+
+            if (error.response?.status === 409) {
+                setError("User already exists. Try signing in.");
+            } else if (error.response?.status === 400) {
+                setError("Invalid input. Please check your details.");
             } else {
                 setError("Something went wrong. Please try again later.");
             }
