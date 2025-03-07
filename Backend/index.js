@@ -15,6 +15,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: "https://movie-rating-ui.vercel.app", // Change this if needed
+    methods: ["GET", "POST", "DELETE"],
     credentials: true,
   })
 );
