@@ -12,8 +12,12 @@ dotenv.config(); // Load environment variables
 
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: "https://movie-rating-ui.vercel.app", credentials: true }));
-
+app.use(
+  cors({
+    origin: "https://movie-rating-ui.vercel.app",
+    credentials: true,
+  })
+);
 const PORT = process.env.PORT || 3000;
 
 // ✅ MongoDB Atlas Connection
@@ -39,11 +43,19 @@ app.post("/signup", async (req, res) => {
     const { username, email, password } = req.body;
 
     const existingUsers = await UserModel.find();
-    let userId = existingUsers.length === 0 ? 1 : Math.max(...existingUsers.map((user) => user.userId)) + 1;
+    let userId =
+      existingUsers.length === 0
+        ? 1
+        : Math.max(...existingUsers.map((user) => user.userId)) + 1;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new UserModel({ username, email, password: hashedPassword, userId });
+    const newUser = new UserModel({
+      username,
+      email,
+      password: hashedPassword,
+      userId,
+    });
     await newUser.save();
 
     res.status(201).json({ message: "User created successfully", userId });
@@ -62,9 +74,16 @@ app.post("/signin", async (req, res) => {
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) return res.status(401).json({ message: "Invalid credentials" });
+    if (!isPasswordValid)
+      return res.status(401).json({ message: "Invalid credentials" });
 
-    res.status(200).json({ message: "Login successful", username: user.username, userId: user.userId });
+    res
+      .status(200)
+      .json({
+        message: "Login successful",
+        username: user.username,
+        userId: user.userId,
+      });
   } catch (error) {
     console.error("❌ Error in Signin:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -74,12 +93,33 @@ app.post("/signin", async (req, res) => {
 // ✅ Submit a Movie Rating
 app.post("/showmore", async (req, res) => {
   try {
-    const { userId, username, rating, moviename, comment, mediaType, mediaId, day, month, year } = req.body;
+    const {
+      userId,
+      username,
+      rating,
+      moviename,
+      comment,
+      mediaType,
+      mediaId,
+      day,
+      month,
+      year,
+    } = req.body;
 
     const ratingId = (await RatingModel.countDocuments()) + 101;
 
     const newRating = new RatingModel({
-      ratingId, userId, username, rating, moviename, comment, mediaType, mediaId, day, month, year,
+      ratingId,
+      userId,
+      username,
+      rating,
+      moviename,
+      comment,
+      mediaType,
+      mediaId,
+      day,
+      month,
+      year,
     });
 
     await newRating.save();
