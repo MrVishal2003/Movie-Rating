@@ -14,11 +14,15 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://movie-rating-ui.vercel.app", // Change this if needed
+    origin: "https://movie-rating-ui.vercel.app", // Your frontend URL
     methods: ["GET", "POST", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
+
+// ✅ Handle Preflight (OPTIONS) Requests
+app.options("*", cors());
 
 // ✅ MongoDB Connection
 mongoose
