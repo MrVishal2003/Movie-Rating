@@ -4,7 +4,6 @@ const ratingSchema = new mongoose.Schema({
   ratingId: {
     type: Number,
     required: true,
-    unique: true,
   },
   userId: {
     type: Number,
@@ -48,4 +47,5 @@ const ratingSchema = new mongoose.Schema({
 });
 
 const RatingModel = mongoose.model("Rating", ratingSchema);
+
 export default RatingModel;
