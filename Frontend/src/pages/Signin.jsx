@@ -9,8 +9,6 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 function SignIn() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -18,7 +16,7 @@ function SignIn() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        axios.post(`${API_BASE_URL}/signin`, { email, password })
+        axios.post("http://localhost:3000/signin", { email, password })
             .then(response => {
                 if (response.status === 200) {
                     localStorage.setItem('isLoggedIn', 'true');

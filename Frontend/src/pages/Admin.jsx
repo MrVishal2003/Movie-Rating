@@ -3,16 +3,18 @@ import '../css/Navbar.css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 function Admin() {
     const [users, setUsers] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get(`${API_BASE_URL}/admin/users`)
-            .then(response => setUsers(response.data))
-            .catch(error => console.error('Error fetching users:', error));
+        axios.get('http://localhost:3000/admin/users')
+            .then(response => {
+                setUsers(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching users:', error);
+            });
     }, []);
 
     const handleShowMore = (userId) => {
@@ -20,12 +22,15 @@ function Admin() {
     };
 
     const handleDelete = (userId) => {
-        axios.delete(`${API_BASE_URL}/admin/users/${userId}`)
+        axios.delete(`http://localhost:3000/admin/users/${userId}`)
             .then(response => {
                 console.log('User deleted successfully');
+                console.log(response);
                 setUsers(prevUsers => prevUsers.filter(user => user.userId !== userId));
             })
-            .catch(error => console.error('Error deleting user:', error));
+            .catch(error => {
+                console.error('Error deleting user:', error);
+            });
     };
 
     const handleSignOut = () => {
@@ -60,7 +65,7 @@ function Admin() {
                     {users.map(user => (
                         <div key={user._id} className='flex border-b border-gray-300 py-4'>
                             <div className="flex items-center">
-                                <div className="p-6 bg-orange-500 h-10 w-10 text-center flex items-center justify-center rounded-full mr-4 uppercase">
+                                <div className={`p-6 bg-orange-500 h-10 w-10 text-center flex items-center justify-center rounded-full mr-4 uppercase`}>
                                     {user.username.charAt(0)}
                                 </div>
                                 <div className="font-bold mr-32">{user.username}</div>

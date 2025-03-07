@@ -3,8 +3,6 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Star } from "@mui/icons-material";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 function UserData() {
     const { userId } = useParams();
     const [userData, setUserData] = useState(null);
@@ -13,7 +11,7 @@ function UserData() {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`${API_BASE_URL}/admin/users/${userId}`)
+        axios.get(`http://localhost:3000/admin/users/${userId}`)
             .then(response => {
                 setUserData(response.data);
             })
@@ -27,8 +25,8 @@ function UserData() {
 
     const handleRemoveRating = async (ratingId) => {
         try {
-            await axios.delete(`${API_BASE_URL}/admin/ratings/${ratingId}`);
-            axios.get(`${API_BASE_URL}/admin/users/${userId}`)
+            await axios.delete(`http://localhost:3000/admin/ratings/${ratingId}`);
+            axios.get(`http://localhost:3000/admin/users/${userId}`)
                 .then(response => {
                     setUserData(response.data);
                 })

@@ -9,8 +9,6 @@ import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import StarIcon from '@mui/icons-material/Star';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 function ShowMore() {
     const { mediaType, id } = useParams();
     const [content, setContent] = useState(() => {
@@ -37,7 +35,7 @@ function ShowMore() {
     }, [navigate]);
 
     useEffect(() => {
-        axios.get(`${API_BASE_URL}/ratings`, {
+        axios.get('http://localhost:3000/ratings', {
             params: {
                 mediaId: id
             }
@@ -47,6 +45,19 @@ function ShowMore() {
             })
             .catch(error => console.error('Error fetching reviews:', error));
     }, [id]);
+
+    // useEffect(() => {
+    //     axios.get('http://localhost:3000/userdata')
+    //         .then(response => {
+    //             const userData = response.data;
+    //             const user = userData.find(user => user.username === username);
+    //             if (user) {
+    //                 setUsername(user.username);
+    //                 setUserId(user.userId);
+    //             }
+    //         })
+    //         .catch(error => console.error('Error fetching user data:', error));
+    // }, [username]);
 
     // Save content and username and userId to localStorage
     useEffect(() => {
@@ -74,7 +85,7 @@ function ShowMore() {
             const currentMonth = `${currentDate.toLocaleString('default', { month: 'long' })}`;
             const currentYear = `${currentDate.getFullYear()}`;
 
-            await axios.post(`${API_BASE_URL}/showmore`, {
+            await axios.post('http://localhost:3000/showmore', {
                 userId: userId,
                 username: username,
                 rating: rating,
@@ -87,7 +98,7 @@ function ShowMore() {
                 year: currentYear
             });
 
-            const response = await axios.get(`${API_BASE_URL}/ratings?mediaId=${id}`);
+            const response = await axios.get(`http://localhost:3000/ratings?mediaId=${id}`);
             setReviews(response.data);
 
             handleClose();
