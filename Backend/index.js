@@ -18,7 +18,6 @@ app.use(
     credentials: true,
   })
 );
-const PORT = process.env.PORT || 3000;
 
 // ✅ MongoDB Atlas Connection
 mongoose
@@ -77,13 +76,11 @@ app.post("/signin", async (req, res) => {
     if (!isPasswordValid)
       return res.status(401).json({ message: "Invalid credentials" });
 
-    res
-      .status(200)
-      .json({
-        message: "Login successful",
-        username: user.username,
-        userId: user.userId,
-      });
+    res.status(200).json({
+      message: "Login successful",
+      username: user.username,
+      userId: user.userId,
+    });
   } catch (error) {
     console.error("❌ Error in Signin:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -130,16 +127,6 @@ app.post("/showmore", async (req, res) => {
   }
 });
 
-// ✅ Check Authentication Status
-app.get("/api/authenticated", async (req, res) => {
-  try {
-    res.json({ authenticated: true });
-  } catch (error) {
-    console.error("❌ Error in Authentication Check:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
 // ✅ Get Ratings for a Movie
 app.get("/ratings", async (req, res) => {
   try {
@@ -152,7 +139,15 @@ app.get("/ratings", async (req, res) => {
   }
 });
 
-// ✅ Start Server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+// ✅ Check Authentication Status
+app.get("/api/authenticated", async (req, res) => {
+  try {
+    res.json({ authenticated: true });
+  } catch (error) {
+    console.error("❌ Error in Authentication Check:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
+
+// ✅ Export app (Vercel does not require app.listen)
+export default app;
