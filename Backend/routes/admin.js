@@ -4,16 +4,7 @@ import RatingModel from "../models/Rating.js";
 
 const router = express.Router();
 
-// ✅ Middleware to Check Admin Access
-const isAdmin = (req, res, next) => {
-  const { adminSecret } = req.headers; // Use a secure token-based authentication instead
-  if (adminSecret !== process.env.ADMIN_SECRET) {
-    return res.status(403).json({ message: "Unauthorized access" });
-  }
-  next();
-};
-
-// ✅ Get All Users
+// ✅ Get all users
 router.get("/users", async (req, res) => {
   try {
     const users = await UserModel.find();
@@ -24,13 +15,15 @@ router.get("/users", async (req, res) => {
   }
 });
 
-// ✅ Get User Details by userId (Including Ratings)
+// ✅ Get user details by userId (including their ratings)
 router.get("/users/:userId", async (req, res) => {
   try {
     const userId = Number(req.params.userId);
     const user = await UserModel.findOne({ userId });
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
     const userRatings = await RatingModel.find({ userId });
 
@@ -41,35 +34,39 @@ router.get("/users/:userId", async (req, res) => {
   }
 });
 
-// ✅ Delete User (With Ratings)
-router.delete("/users/:userId", isAdmin, async (req, res) => {
+// ✅ Delete a user by userId
+router.delete("/users/:userId", async (req, res) => {
   try {
     const userId = Number(req.params.userId);
     const deletedUser = await UserModel.findOneAndDelete({ userId });
 
-    if (!deletedUser) return res.status(404).json({ message: "User not found" });
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    // Cascade delete user ratings
+    // Also delete the user's ratings
     await RatingModel.deleteMany({ userId });
 
-    res.json({ message: "User and their ratings deleted successfully" });
+    res.json({ message: "User and their ratings deleted successfully", deletedUser });
   } catch (error) {
     console.error("❌ Error deleting user:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
 
-// ✅ Delete Rating by ratingId
-router.delete("/ratings/:ratingId", isAdmin, async (req, res) => {
+// ✅ Delete a rating by ratingId
+router.delete("/ratings/:ratingId", async (req, res) => {
   try {
     const ratingId = Number(req.params.ratingId);
     const deletedRating = await RatingModel.findOneAndDelete({ ratingId });
 
-    if (!deletedRating) return res.status(404).json({ message: "Rating not found" });
+    if (!deletedRating) {
+      return res.status(404).json({ message: "Rating not found" });
+    }
 
-    res.json({ message: "Rating entry deleted successfully" });
+    res.json({ message: "Rating deleted successfully", deletedRating });
   } catch (error) {
-    console.error("❌ Error deleting rating entry:", error);
+    console.error("❌ Error deleting rating:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
