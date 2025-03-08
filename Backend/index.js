@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());
 
 // ✅ Dynamic CORS Configuration
-const allowedOrigins = ["http://localhost:5173"];
+const allowedOrigins = ["https://movie-rating-ui.vercel.app"];
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 app.use("/admin", adminRoute);
