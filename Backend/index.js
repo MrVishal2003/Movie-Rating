@@ -8,19 +8,18 @@ import UserModel from "./models/Users.js";
 import RatingModel from "./models/Rating.js";
 import adminRoute from "./routes/admin.js";
 
-dotenv.config();
+dotenv.config(); // Load environment variables
 
 const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://movie-rating-ui.vercel.app", // Change this if needed
-    methods: ["GET", "POST", "DELETE"],
+    origin: "https://movie-rating-ui.vercel.app",
     credentials: true,
   })
 );
 
-// ✅ MongoDB Connection
+// ✅ MongoDB Atlas Connection
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -29,7 +28,7 @@ mongoose
   .then(() => console.log("✅ Connected to MongoDB Atlas"))
   .catch((error) => console.error("❌ MongoDB Connection Error:", error));
 
-// ✅ Default Route
+// ✅ Default Route for Backend Status
 app.get("/", (req, res) => {
   res.send("✅ Backend is running successfully!");
 });
@@ -77,13 +76,11 @@ app.post("/signin", async (req, res) => {
     if (!isPasswordValid)
       return res.status(401).json({ message: "Invalid credentials" });
 
-    res
-      .status(200)
-      .json({
-        message: "Login successful",
-        username: user.username,
-        userId: user.userId,
-      });
+    res.status(200).json({
+      message: "Login successful",
+      username: user.username,
+      userId: user.userId,
+    });
   } catch (error) {
     console.error("❌ Error in Signin:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -130,16 +127,6 @@ app.post("/showmore", async (req, res) => {
   }
 });
 
-// ✅ Check Authentication Status
-app.get("/api/authenticated", async (req, res) => {
-  try {
-    res.json({ authenticated: true });
-  } catch (error) {
-    console.error("❌ Error in Authentication Check:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
 // ✅ Get Ratings for a Movie
 app.get("/ratings", async (req, res) => {
   try {
@@ -152,5 +139,15 @@ app.get("/ratings", async (req, res) => {
   }
 });
 
-// ✅ Export the Express app for Vercel (⚠️ Important for deployment)
+// ✅ Check Authentication Status
+app.get("/api/authenticated", async (req, res) => {
+  try {
+    res.json({ authenticated: true });
+  } catch (error) {
+    console.error("❌ Error in Authentication Check:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// ✅ Export app (Vercel does not require app.listen)
 export default app;
