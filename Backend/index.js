@@ -157,4 +157,4 @@ app.get("/ratings", async (req, res) => {
 });
 
 // ✅ Export the Express app for Vercel (⚠️ Important for deployment)
-export default app;
+export default app;  make for vercell and localhost both access 
