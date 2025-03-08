@@ -11,7 +11,7 @@ function UserData() {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`https://backend-gjlay5gsi-mrvishal2003s-projects.vercel.app/admin/users/${userId}`)
+        axios.get(`http://localhost:3000/admin/users/${userId}`)
             .then(response => {
                 setUserData(response.data);
             })
@@ -22,10 +22,10 @@ function UserData() {
                 setLoading(false);
             });
     }, [userId]);
-
+zz
     const handleRemoveRating = async (ratingId) => {
         try {
-            await axios.delete(`https://backend-gjlay5gsi-mrvishal2003s-projects.vercel.app/admin/ratings/${ratingId}`);
+            await axios.delete(`http://localhost:3000/admin/ratings/${ratingId}`);
             axios.get(`http://localhost:3000/admin/users/${userId}`)
                 .then(response => {
                     setUserData(response.data);

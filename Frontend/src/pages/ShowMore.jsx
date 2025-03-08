@@ -35,7 +35,7 @@ function ShowMore() {
     }, [navigate]);
 
     useEffect(() => {
-        axios.get('https://backend-seven-kappa-97.vercel.app/ratings', {
+        axios.get('http://localhost:3000/ratings', {
             params: {
                 mediaId: id
             }
@@ -46,6 +46,20 @@ function ShowMore() {
             .catch(error => console.error('Error fetching reviews:', error));
     }, [id]);
 
+    // useEffect(() => {
+    //     axios.get('http://localhost:3000/userdata')
+    //         .then(response => {
+    //             const userData = response.data;
+    //             const user = userData.find(user => user.username === username);
+    //             if (user) {
+    //                 setUsername(user.username);
+    //                 setUserId(user.userId);
+    //             }
+    //         })
+    //         .catch(error => console.error('Error fetching user data:', error));
+    // }, [username]);
+
+    // Save content and username and userId to localStorage
     useEffect(() => {
         localStorage.setItem('content', JSON.stringify(content));
         localStorage.setItem('username', username);
@@ -71,7 +85,7 @@ function ShowMore() {
             const currentMonth = `${currentDate.toLocaleString('default', { month: 'long' })}`;
             const currentYear = `${currentDate.getFullYear()}`;
 
-            await axios.post('https://backend-seven-kappa-97.vercel.app/showmore', {
+            await axios.post('http://localhost:3000/showmore', {
                 userId: userId,
                 username: username,
                 rating: rating,
@@ -84,7 +98,7 @@ function ShowMore() {
                 year: currentYear
             });
 
-            const response = await axios.get(`https://backend-seven-kappa-97.vercel.app/ratings?mediaId=${id}`);
+            const response = await axios.get(`http://localhost:3000/ratings?mediaId=${id}`);
             setReviews(response.data);
 
             handleClose();
