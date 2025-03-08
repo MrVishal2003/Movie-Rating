@@ -152,14 +152,9 @@ app.post("/showmore", async (req, res) => {
 
 // ✅ Secure Authentication Check API
 app.get("/api/authenticated", verifyToken, (req, res) => {
-  try {
-    const authenticated = true;
-    res.json({ authenticated });
-  } catch (error) {
-    console.error("Error checking authentication:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
+  res.json({ authenticated: true, user: req.user });
 });
+
 // ✅ Fetch Ratings API
 app.get("/ratings", async (req, res) => {
   try {
