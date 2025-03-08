@@ -184,10 +184,11 @@ app.get("/ratings", async (req, res) => {
 });
 
 // ✅ Start Server (For Development)
-if (process.env.NODE_ENV !== "production") {
+if (!process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`🚀 Server started on port ${PORT}`);
   });
 }
+
 
 export default app; // Required for Vercel deployment
