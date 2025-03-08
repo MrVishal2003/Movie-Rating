@@ -14,8 +14,23 @@ const app = express();
 app.use(express.json());
 
 // ✅ Dynamic CORS Configuration
-const allowedOrigins = [process.env.FRONTEND_URL, "http://localhost:5173"];
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+const allowedOrigins = process.env.FRONTEND_URL?.split(",") || [
+  "http://localhost:5173",
+  "https://movie-rating-ui.vercel.app",
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 app.use("/admin", adminRoute);
 
@@ -33,7 +48,10 @@ mongoose
 // ✅ Secure Middleware (JWT Verification)
 const verifyToken = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1]; // Extract JWT token
-  if (!token) return res.status(401).json({ authenticated: false, message: "No token provided." });
+  if (!token)
+    return res
+      .status(401)
+      .json({ authenticated: false, message: "No token provided." });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify token
@@ -57,10 +75,18 @@ app.post("/signup", async (req, res) => {
     const existingUsers = await UserModel.find();
 
     // Auto-generate user ID
-    const userId = existingUsers.length === 0 ? 1 : Math.max(...existingUsers.map((user) => user.userId)) + 1;
+    const userId =
+      existingUsers.length === 0
+        ? 1
+        : Math.max(...existingUsers.map((user) => user.userId)) + 1;
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new UserModel({ username, email, password: hashedPassword, userId });
+    const newUser = new UserModel({
+      username,
+      email,
+      password: hashedPassword,
+      userId,
+    });
     await newUser.save();
 
     res.status(201).json({ message: "User created successfully", userId });
@@ -79,12 +105,22 @@ app.post("/signin", async (req, res) => {
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) return res.status(401).json({ message: "Invalid credentials" });
+    if (!isPasswordValid)
+      return res.status(401).json({ message: "Invalid credentials" });
 
     // ✅ Generate JWT Token
-    const token = jwt.sign({ userId: user.userId, username: user.username }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign(
+      { userId: user.userId, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
 
-    res.status(200).json({ message: "Login successful", token, userId: user.userId, username: user.username });
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      userId: user.userId,
+      username: user.username,
+    });
   } catch (error) {
     console.error("Error logging in user:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -94,10 +130,33 @@ app.post("/signin", async (req, res) => {
 // ✅ Add Rating API
 app.post("/showmore", async (req, res) => {
   try {
-    const { userId, username, rating, moviename, comment, mediaType, mediaId, day, month, year } = req.body;
+    const {
+      userId,
+      username,
+      rating,
+      moviename,
+      comment,
+      mediaType,
+      mediaId,
+      day,
+      month,
+      year,
+    } = req.body;
     const ratingId = (await RatingModel.countDocuments()) + 101;
 
-    const newRating = new RatingModel({ ratingId, userId, username, rating, moviename, comment, mediaType, mediaId, day, month, year });
+    const newRating = new RatingModel({
+      ratingId,
+      userId,
+      username,
+      rating,
+      moviename,
+      comment,
+      mediaType,
+      mediaId,
+      day,
+      month,
+      year,
+    });
     await newRating.save();
 
     res.status(201).json({ message: "Rating saved successfully", ratingId });
