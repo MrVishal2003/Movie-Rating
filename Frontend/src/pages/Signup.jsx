@@ -7,7 +7,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import axios from 'axios';
 
-const REACT_APP_API_URL = "http://localhost:3000";
+const REACT_APP_API_URL = "https://backend-seven-kappa-97.vercel.app";
 
 function SignUp() {
     const [username, setName] = useState("");

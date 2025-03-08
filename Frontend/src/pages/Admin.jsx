@@ -3,7 +3,7 @@ import '../css/Navbar.css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const REACT_APP_API_URL = "http://localhost:3000";
+const REACT_APP_API_URL = "https://backend-seven-kappa-97.vercel.app";
 
 function Admin() {
     const [users, setUsers] = useState([]);

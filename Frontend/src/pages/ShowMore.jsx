@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import StarIcon from '@mui/icons-material/Star';
 
-const REACT_APP_API_URL = "http://localhost:3000";
+const REACT_APP_API_URL = "https://backend-seven-kappa-97.vercel.app";
 
 function ShowMore() {
     const { mediaType, id } = useParams();
