@@ -7,7 +7,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import axios from 'axios';
 
-const API_BASE_URL = "http://localhost:3000";
+const REACT_APP_API_URL = "http://localhost:3000";
 
 function SignUp() {
     const [username, setName] = useState("");
@@ -21,7 +21,7 @@ function SignUp() {
         setError(null);
 
         try {
-            const response = await axios.post(`${API_BASE_URL}/signup`, { username, email, password });
+            const response = await axios.post(`${REACT_APP_API_URL}/signup`, { username, email, password });
 
             if (response.status === 201) {
                 navigate('/signin');

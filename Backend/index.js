@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());
 
 // ✅ Dynamic CORS Configuration
-const allowedOrigins = ["https://your-frontend-url.vercel.app"]; // replace with your frontend URL
+const allowedOrigins = ["https://movie-rating-ui.vercel.app"]; // replace with your frontend URL
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 app.use("/admin", adminRoute);

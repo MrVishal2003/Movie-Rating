@@ -8,7 +8,7 @@ import Button from '../components/Button';
 import { useState } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = "http://localhost:3000";
+const REACT_APP_API_URL = "http://localhost:3000";
 
 function SignIn() {
     const [email, setEmail] = useState("");
@@ -21,7 +21,7 @@ function SignIn() {
         setError(null);
 
         try {
-            const response = await axios.post(`${API_BASE_URL}/signin`, { email, password });
+            const response = await axios.post(`${REACT_APP_API_URL}/signin`, { email, password });
 
             if (response.status === 200) {
                 localStorage.setItem('isLoggedIn', 'true');

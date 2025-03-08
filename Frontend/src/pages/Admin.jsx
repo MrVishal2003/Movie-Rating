@@ -3,14 +3,14 @@ import '../css/Navbar.css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = "http://localhost:3000";
+const REACT_APP_API_URL = "http://localhost:3000";
 
 function Admin() {
     const [users, setUsers] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get(`${API_BASE_URL}/admin/users`)
+        axios.get(`${REACT_APP_API_URL}/admin/users`)
             .then(response => {
                 setUsers(response.data);
             })
@@ -24,7 +24,7 @@ function Admin() {
     };
 
     const handleDelete = (userId) => {
-        axios.delete(`${API_BASE_URL}/admin/users/${userId}`)
+        axios.delete(`${REACT_APP_API_URL}/admin/users/${userId}`)
             .then(response => {
                 console.log('User deleted successfully:', response);
                 setUsers(prevUsers => prevUsers.filter(user => user.userId !== userId));

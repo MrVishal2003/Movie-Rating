@@ -9,11 +9,11 @@ function UserData() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const API_BASE_URL = "http://localhost:3000";
+    const REACT_APP_API_URL = "https://backend-seven-kappa-97.vercel.app";
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`${API_BASE_URL}/admin/users/${userId}`)
+        axios.get(`${REACT_APP_API_URL}/admin/users/${userId}`)
             .then(response => {
                 setUserData(response.data);
             })
@@ -23,11 +23,11 @@ function UserData() {
             .finally(() => {
                 setLoading(false);
             });
-    }, [userId, API_BASE_URL]);
+    }, [userId, REACT_APP_API_URL]);
 
     const handleRemoveRating = async (ratingId) => {
         try {
-            await axios.delete(`${API_BASE_URL}/admin/ratings/${ratingId}`);
+            await axios.delete(`${REACT_APP_API_URL}/admin/ratings/${ratingId}`);
             // Update the state instead of making an extra API call
             setUserData(prevData => ({
                 ...prevData,
