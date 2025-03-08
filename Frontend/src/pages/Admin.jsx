@@ -3,12 +3,14 @@ import '../css/Navbar.css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+
 function Admin() {
     const [users, setUsers] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('https://backend-seven-kappa-97.vercel.app/admin/users')
+        axios.get(`${API_BASE_URL}/admin/users`)
             .then(response => {
                 setUsers(response.data);
             })
@@ -22,10 +24,9 @@ function Admin() {
     };
 
     const handleDelete = (userId) => {
-        axios.delete(`https://backend-seven-kappa-97.vercel.app/admin/users/${userId}`)
+        axios.delete(`${API_BASE_URL}/admin/users/${userId}`)
             .then(response => {
-                console.log('User deleted successfully');
-                console.log(response);
+                console.log('User deleted successfully:', response);
                 setUsers(prevUsers => prevUsers.filter(user => user.userId !== userId));
             })
             .catch(error => {
