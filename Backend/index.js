@@ -13,22 +13,15 @@ dotenv.config(); // Load environment variables
 const app = express();
 app.use(express.json());
 
-// ✅ Dynamic CORS Configuration
-const allowedOrigins = process.env.FRONTEND_URL?.split(",") || [
-  "http://localhost:5173",
-  "https://movie-rating-ui.vercel.app",
-];
-
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: [
+      "http://localhost:5173",
+      "https://movie-rating-ch0vszeuw-mrvishal2003s-projects.vercel.app",
+    ],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -181,5 +174,5 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
-// ✅ Export Express App for Vercel
+// ✅ Export Express App for Vercel Deployment
 export default app;
