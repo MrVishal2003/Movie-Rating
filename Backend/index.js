@@ -36,7 +36,7 @@ app.use("/admin", adminRoute);
 
 const PORT = process.env.PORT || 3000;
 
-// ✅ Connect to MongoDB Atlas (or Local)
+// ✅ Connect to MongoDB Atlas
 mongoose
   .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
@@ -47,15 +47,13 @@ mongoose
 
 // ✅ Secure Middleware (JWT Verification)
 const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1]; // Extract JWT token
+  const token = req.headers.authorization?.split(" ")[1];
   if (!token)
-    return res
-      .status(401)
-      .json({ authenticated: false, message: "No token provided." });
+    return res.status(401).json({ authenticated: false, message: "No token provided." });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify token
-    req.user = decoded; // Attach user data
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
     next();
   } catch (error) {
     console.error("Invalid token:", error);
@@ -74,19 +72,13 @@ app.post("/signup", async (req, res) => {
     const { username, email, password } = req.body;
     const existingUsers = await UserModel.find();
 
-    // Auto-generate user ID
-    const userId =
-      existingUsers.length === 0
-        ? 1
-        : Math.max(...existingUsers.map((user) => user.userId)) + 1;
+    const userId = existingUsers.length === 0
+      ? 1
+      : Math.max(...existingUsers.map(user => user.userId)) + 1;
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new UserModel({
-      username,
-      email,
-      password: hashedPassword,
-      userId,
-    });
+    const newUser = new UserModel({ username, email, password: hashedPassword, userId });
     await newUser.save();
 
     res.status(201).json({ message: "User created successfully", userId });
@@ -108,7 +100,6 @@ app.post("/signin", async (req, res) => {
     if (!isPasswordValid)
       return res.status(401).json({ message: "Invalid credentials" });
 
-    // ✅ Generate JWT Token
     const token = jwt.sign(
       { userId: user.userId, username: user.username },
       process.env.JWT_SECRET,
@@ -166,7 +157,7 @@ app.post("/showmore", async (req, res) => {
   }
 });
 
-// ✅ Secure Authentication Check API (Uses JWT)
+// ✅ Secure Authentication Check API
 app.get("/api/authenticated", verifyToken, (req, res) => {
   res.json({ authenticated: true, user: req.user });
 });
@@ -184,11 +175,11 @@ app.get("/ratings", async (req, res) => {
 });
 
 // ✅ Start Server (For Development)
-if (!process.env.VERCEL) {
+if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {
     console.log(`🚀 Server started on port ${PORT}`);
   });
 }
 
-
-export default app; // Required for Vercel deployment
+// ✅ Export Express App for Vercel
+export default app;
