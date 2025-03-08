@@ -18,7 +18,8 @@ function App() {
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/authenticated`, { withCredentials: true })
+    // Check if user is authenticated when component mounts
+    axios.get('/api/authenticated')
       .then(response => {
         setAuthenticated(response.data.authenticated);
       })
@@ -43,9 +44,9 @@ function App() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/users/:userId" element={<UserData />} />
         {authenticated ? (
-          <Route path="/:mediaType/:id" element={<ShowMore />} />
-        ) : (
           <Route path="/:mediaType/:id" element={<Navigate to="/signin" />} />
+        ) : (
+          <Route path="/:mediaType/:id" element={<ShowMore />} />
         )}
       </Routes>
     </Router>

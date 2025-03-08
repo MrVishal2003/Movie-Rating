@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import StarIcon from '@mui/icons-material/Star';
 
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+const API_BASE_URL = "http://localhost:3000";
 
 function ShowMore() {
     const { mediaType, id } = useParams();
