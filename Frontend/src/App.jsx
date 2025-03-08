@@ -32,8 +32,10 @@ function App() {
 
   return (
     <Router>
+      {/* Only render Navbar on non-admin pages */}
       {!isAdminPage && <Navbar />}
       <Routes>
+        {/* Public routes */}
         <Route exact path="/" element={<Home />} />
         <Route path="/movies" element={<Movies />} />
         <Route path="/tv-series" element={<Series />} />
@@ -41,13 +43,16 @@ function App() {
         <Route path="/top-rated" element={<TopRated />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+
+        {/* Admin routes */}
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/users/:userId" element={<UserData />} />
-        {authenticated ? (
-          <Route path="/:mediaType/:id" element={<Navigate to="/signin" />} />
-        ) : (
-          <Route path="/:mediaType/:id" element={<ShowMore />} />
-        )}
+
+        {/* Protected Route: Redirect unauthenticated users to /signin */}
+        <Route 
+          path="/:mediaType/:id" 
+          element={authenticated ? <ShowMore /> : <Navigate to="/signin" />}
+        />
       </Routes>
     </Router>
   );
