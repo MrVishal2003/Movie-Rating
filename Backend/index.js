@@ -1,45 +1,41 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import dotenv from "dotenv";
 import UserModel from "./models/Users.js";
 import bcrypt from "bcrypt";
 import RatingModel from "./models/Rating.js";
 import adminRoute from "./routes/admin.js";
-import dotenv from "dotenv";
 
 dotenv.config(); // Load environment variables
 
 const app = express();
 app.use(express.json());
-
-// Enable CORS for frontend deployed on Vercel
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL, // Allow requests only from frontend
-    credentials: true,
-  })
-);
-
+app.use(cors());
 app.use("/admin", adminRoute);
 
-// Connect to MongoDB (Replace with MongoDB Atlas URL)
+const PORT = process.env.PORT || 3000;
+
+// Connect to MongoDB Atlas
 mongoose
-  .connect(process.env.MONGO_URI, {
+  .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log("Connected to MongoDB Atlas"))
-  .catch((error) => console.error("MongoDB connection error:", error));
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
-// Routes
+// Default route
+app.get("/", (req, res) => {
+  res.send("🎬 Movie Rating API is running 🚀");
+});
+
+// Signup API
 app.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
-
-    // Check if any users exist in the database
     const existingUsers = await UserModel.find();
-    let userId = existingUsers.length ? Math.max(...existingUsers.map((user) => user.userId)) + 1 : 1;
-    
+    let userId = existingUsers.length === 0 ? 1 : Math.max(...existingUsers.map((user) => user.userId)) + 1;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new UserModel({ username, email, password: hashedPassword, userId });
@@ -52,11 +48,11 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+// Signin API
 app.post("/signin", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await UserModel.findOne({ email });
-
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -69,6 +65,33 @@ app.post("/signin", async (req, res) => {
   }
 });
 
+// Add Rating API
+app.post("/showmore", async (req, res) => {
+  try {
+    const { userId, username, rating, moviename, comment, mediaType, mediaId, day, month, year } = req.body;
+    const ratingId = (await RatingModel.countDocuments()) + 101;
+
+    const newRating = new RatingModel({ ratingId, userId, username, rating, moviename, comment, mediaType, mediaId, day, month, year });
+    await newRating.save();
+
+    res.status(201).json({ message: "Rating saved successfully", ratingId });
+  } catch (error) {
+    console.error("Error saving rating:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Check Authentication API
+app.get("/api/authenticated", (req, res) => {
+  try {
+    res.json({ authenticated: true });
+  } catch (error) {
+    console.error("Error checking authentication:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Fetch Ratings API
 app.get("/ratings", async (req, res) => {
   try {
     const { mediaId } = req.query;
@@ -80,4 +103,11 @@ app.get("/ratings", async (req, res) => {
   }
 });
 
-export default app; // Required for Vercel
+// Start server (only for local development)
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`Server started on port ${PORT}`);
+  });
+}
+
+export default app; // Required for Vercel deployment
