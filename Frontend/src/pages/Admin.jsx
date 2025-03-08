@@ -8,7 +8,7 @@ function Admin() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('http://localhost:3000/admin/users')
+        axios.get('https://backend-seven-kappa-97.vercel.app/admin/users')
             .then(response => {
                 setUsers(response.data);
             })
@@ -22,7 +22,7 @@ function Admin() {
     };
 
     const handleDelete = (userId) => {
-        axios.delete(`http://localhost:3000/admin/users/${userId}`)
+        axios.delete(`https://backend-seven-kappa-97.vercel.app/admin/users/${userId}`)
             .then(response => {
                 console.log('User deleted successfully');
                 console.log(response);

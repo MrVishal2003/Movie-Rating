@@ -11,7 +11,7 @@ function UserData() {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:3000/admin/users/${userId}`)
+        axios.get(`https://backend-seven-kappa-97.vercel.app/admin/users/${userId}`)
             .then(response => {
                 setUserData(response.data);
             })
@@ -25,8 +25,8 @@ function UserData() {
 zz
     const handleRemoveRating = async (ratingId) => {
         try {
-            await axios.delete(`http://localhost:3000/admin/ratings/${ratingId}`);
-            axios.get(`http://localhost:3000/admin/users/${userId}`)
+            await axios.delete(`https://backend-seven-kappa-97.vercel.app/admin/ratings/${ratingId}`);
+            axios.get(`https://backend-seven-kappa-97.vercel.app/admin/users/${userId}`)
                 .then(response => {
                     setUserData(response.data);
                 })
