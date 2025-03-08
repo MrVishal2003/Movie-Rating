@@ -13,17 +13,17 @@ dotenv.config(); // Load environment variables
 const app = express();
 app.use(express.json());
 
+const allowedOrigins = process.env.FRONTEND_URL.split(" ");
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://movie-rating-ch0vszeuw-mrvishal2003s-projects.vercel.app",
-    ],
+    origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 
 app.use("/admin", adminRoute);
 
