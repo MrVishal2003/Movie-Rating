@@ -5,42 +5,44 @@ import UserModel from "./models/Users.js";
 import bcrypt from "bcrypt";
 import RatingModel from "./models/Rating.js";
 import adminRoute from "./routes/admin.js";
+import dotenv from "dotenv";
+
+dotenv.config(); // Load environment variables
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+// Enable CORS for frontend deployed on Vercel
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL, // Allow requests only from frontend
+    credentials: true,
+  })
+);
+
 app.use("/admin", adminRoute);
 
-app.listen(3000, () => {
-  console.log("Server started on port 3000");
-});
+// Connect to MongoDB (Replace with MongoDB Atlas URL)
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("Connected to MongoDB Atlas"))
+  .catch((error) => console.error("MongoDB connection error:", error));
 
-mongoose.connect("mongodb://localhost:27017/myDatabase", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
+// Routes
 app.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
     // Check if any users exist in the database
     const existingUsers = await UserModel.find();
-    let userId;
-    if (existingUsers.length === 0) {
-      userId = 1;
-    } else {
-      const maxUserId = Math.max(...existingUsers.map((user) => user.userId));
-      userId = maxUserId + 1;
-    }
+    let userId = existingUsers.length ? Math.max(...existingUsers.map((user) => user.userId)) + 1 : 1;
+    
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new UserModel({
-      username,
-      email,
-      password: hashedPassword,
-      userId,
-    });
+    const newUser = new UserModel({ username, email, password: hashedPassword, userId });
     await newUser.save();
 
     res.status(201).json({ message: "User created successfully", userId });
@@ -53,72 +55,16 @@ app.post("/signup", async (req, res) => {
 app.post("/signin", async (req, res) => {
   try {
     const { email, password } = req.body;
-
     const user = await UserModel.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    } else {
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-      res.status(200).json({
-        message: "Login successful",
-        username: user.username,
-        userId: user.userId,
-      });
-    }
+
+    if (!user) return res.status(401).json({ message: "Invalid credentials" });
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) return res.status(401).json({ message: "Invalid credentials" });
+
+    res.status(200).json({ message: "Login successful", username: user.username, userId: user.userId });
   } catch (error) {
     console.error("Error logging in user:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-app.post("/showmore", async (req, res) => {
-  try {
-    const {
-      userId,
-      username,
-      rating,
-      moviename,
-      comment,
-      mediaType,
-      mediaId,
-      day,
-      month,
-      year,
-    } = req.body;
-
-    const ratingId = (await RatingModel.countDocuments()) + 101;
-
-    const newRating = new RatingModel({
-      ratingId,
-      userId,
-      username,
-      rating,
-      moviename,
-      comment,
-      mediaType,
-      mediaId,
-      day,
-      month,
-      year,
-    });
-    await newRating.save();
-
-    res.status(201).json({ message: "Rating saved successfully", ratingId });
-  } catch (error) {
-    console.error("Error saving rating:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-app.get("/api/authenticated", async (req, res) => {
-  try {
-    const authenticated = true;
-    res.json({ authenticated });
-  } catch (error) {
-    console.error("Error checking authentication:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -133,3 +79,5 @@ app.get("/ratings", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+export default app; // Required for Vercel
