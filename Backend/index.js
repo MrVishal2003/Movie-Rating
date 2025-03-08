@@ -111,68 +111,15 @@ app.post("/signin", async (req, res) => {
   }
 });
 
-// ✅ Add Rating API
-app.post("/showmore", async (req, res) => {
-  try {
-    const {
-      userId,
-      username,
-      rating,
-      moviename,
-      comment,
-      mediaType,
-      mediaId,
-      day,
-      month,
-      year,
-    } = req.body;
-    const ratingId = (await RatingModel.countDocuments()) + 101;
-
-    const newRating = new RatingModel({
-      ratingId,
-      userId,
-      username,
-      rating,
-      moviename,
-      comment,
-      mediaType,
-      mediaId,
-      day,
-      month,
-      year,
-    });
-    await newRating.save();
-
-    res.status(201).json({ message: "Rating saved successfully", ratingId });
-  } catch (error) {
-    console.error("Error saving rating:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
 // ✅ Secure Authentication Check API
 app.get("/api/authenticated", verifyToken, (req, res) => {
   res.json({ authenticated: true, user: req.user });
 });
 
-// ✅ Fetch Ratings API
-app.get("/ratings", async (req, res) => {
-  try {
-    const { mediaId } = req.query;
-    const ratings = await RatingModel.find({ mediaId });
-    res.json(ratings);
-  } catch (error) {
-    console.error("Error fetching ratings:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
+// ✅ Start Server (For Development & Production)
+app.listen(PORT, () => {
+  console.log(`🚀 Server started on port ${PORT}`);
 });
-
-// ✅ Start Server (For Development)
-if (process.env.NODE_ENV !== "production") {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server started on port ${PORT}`);
-  });
-}
 
 // ✅ Export Express App for Vercel Deployment
 export default app;
