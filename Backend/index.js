@@ -12,16 +12,9 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-
-// ✅ CORS: Allow Frontend on Vercel & Local Dev
-const allowedOrigins = [
-  "https://movie-rating-ui.vercel.app", // ✅ Deployed frontend
-  "http://localhost:5173", // ✅ Local development
-];
-
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: "https://movie-rating-ui.vercel.app", // Change this if needed
     methods: ["GET", "POST", "DELETE"],
     credentials: true,
   })
@@ -49,13 +42,6 @@ app.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    // Check if email is already registered
-    const existingUser = await UserModel.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "Email already registered" });
-    }
-
-    // Generate unique user ID
     const existingUsers = await UserModel.find();
     let userId =
       existingUsers.length === 0
@@ -70,8 +56,8 @@ app.post("/signup", async (req, res) => {
       password: hashedPassword,
       userId,
     });
-
     await newUser.save();
+
     res.status(201).json({ message: "User created successfully", userId });
   } catch (error) {
     console.error("❌ Error in Signup:", error);
@@ -91,11 +77,13 @@ app.post("/signin", async (req, res) => {
     if (!isPasswordValid)
       return res.status(401).json({ message: "Invalid credentials" });
 
-    res.status(200).json({
-      message: "Login successful",
-      username: user.username,
-      userId: user.userId,
-    });
+    res
+      .status(200)
+      .json({
+        message: "Login successful",
+        username: user.username,
+        userId: user.userId,
+      });
   } catch (error) {
     console.error("❌ Error in Signin:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -117,10 +105,6 @@ app.post("/showmore", async (req, res) => {
       month,
       year,
     } = req.body;
-
-    if (!userId || !moviename || !rating || !mediaId) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
 
     const ratingId = (await RatingModel.countDocuments()) + 101;
 
@@ -147,19 +131,19 @@ app.post("/showmore", async (req, res) => {
 });
 
 // ✅ Check Authentication Status
-app.get("/api/authenticated", (req, res) => {
-  res.json({ authenticated: true });
+app.get("/api/authenticated", async (req, res) => {
+  try {
+    res.json({ authenticated: true });
+  } catch (error) {
+    console.error("❌ Error in Authentication Check:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 // ✅ Get Ratings for a Movie
 app.get("/ratings", async (req, res) => {
   try {
     const { mediaId } = req.query;
-
-    if (!mediaId) {
-      return res.status(400).json({ error: "mediaId is required" });
-    }
-
     const ratings = await RatingModel.find({ mediaId });
     res.json(ratings);
   } catch (error) {
