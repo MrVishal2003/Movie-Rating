@@ -12,9 +12,16 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+
+// ✅ CORS: Allow Frontend on Vercel & Local Dev
+const allowedOrigins = [
+  "https://movie-rating-ui.vercel.app", // ✅ Deployed frontend
+  "http://localhost:5173", // ✅ Local development
+];
+
 app.use(
   cors({
-    origin: "https://movie-rating-ui.vercel.app", // Change if needed
+    origin: allowedOrigins,
     methods: ["GET", "POST", "DELETE"],
     credentials: true,
   })
@@ -42,40 +49,33 @@ app.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    // Validate input
-    if (!username || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    // Check if user already exists
+    // Check if email is already registered
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ message: "User already exists" });
+      return res.status(400).json({ message: "Email already registered" });
     }
 
-    // Generate userId
+    // Generate unique user ID
     const existingUsers = await UserModel.find();
     let userId =
       existingUsers.length === 0
         ? 1
         : Math.max(...existingUsers.map((user) => user.userId)) + 1;
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user
     const newUser = new UserModel({
       username,
       email,
       password: hashedPassword,
       userId,
     });
-    await newUser.save();
 
+    await newUser.save();
     res.status(201).json({ message: "User created successfully", userId });
   } catch (error) {
-    console.error("❌ Error in Signup:", error.message);
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    console.error("❌ Error in Signup:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -118,6 +118,10 @@ app.post("/showmore", async (req, res) => {
       year,
     } = req.body;
 
+    if (!userId || !moviename || !rating || !mediaId) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
     const ratingId = (await RatingModel.countDocuments()) + 101;
 
     const newRating = new RatingModel({
@@ -142,10 +146,20 @@ app.post("/showmore", async (req, res) => {
   }
 });
 
+// ✅ Check Authentication Status
+app.get("/api/authenticated", (req, res) => {
+  res.json({ authenticated: true });
+});
+
 // ✅ Get Ratings for a Movie
 app.get("/ratings", async (req, res) => {
   try {
     const { mediaId } = req.query;
+
+    if (!mediaId) {
+      return res.status(400).json({ error: "mediaId is required" });
+    }
+
     const ratings = await RatingModel.find({ mediaId });
     res.json(ratings);
   } catch (error) {
