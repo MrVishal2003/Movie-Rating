@@ -14,15 +14,11 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://movie-rating-ui.vercel.app", // Your frontend URL
+    origin: "https://movie-rating-ui.vercel.app", // Change if needed
     methods: ["GET", "POST", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
-
-// ✅ Handle Preflight (OPTIONS) Requests
-app.options("*", cors());
 
 // ✅ MongoDB Connection
 mongoose
@@ -46,14 +42,28 @@ app.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
+    // Validate input
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Check if user already exists
+    const existingUser = await UserModel.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: "User already exists" });
+    }
+
+    // Generate userId
     const existingUsers = await UserModel.find();
     let userId =
       existingUsers.length === 0
         ? 1
         : Math.max(...existingUsers.map((user) => user.userId)) + 1;
 
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Create new user
     const newUser = new UserModel({
       username,
       email,
@@ -64,8 +74,8 @@ app.post("/signup", async (req, res) => {
 
     res.status(201).json({ message: "User created successfully", userId });
   } catch (error) {
-    console.error("❌ Error in Signup:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("❌ Error in Signup:", error.message);
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
 });
 
@@ -81,13 +91,11 @@ app.post("/signin", async (req, res) => {
     if (!isPasswordValid)
       return res.status(401).json({ message: "Invalid credentials" });
 
-    res
-      .status(200)
-      .json({
-        message: "Login successful",
-        username: user.username,
-        userId: user.userId,
-      });
+    res.status(200).json({
+      message: "Login successful",
+      username: user.username,
+      userId: user.userId,
+    });
   } catch (error) {
     console.error("❌ Error in Signin:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -134,16 +142,6 @@ app.post("/showmore", async (req, res) => {
   }
 });
 
-// ✅ Check Authentication Status
-app.get("/api/authenticated", async (req, res) => {
-  try {
-    res.json({ authenticated: true });
-  } catch (error) {
-    console.error("❌ Error in Authentication Check:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
 // ✅ Get Ratings for a Movie
 app.get("/ratings", async (req, res) => {
   try {
@@ -157,4 +155,4 @@ app.get("/ratings", async (req, res) => {
 });
 
 // ✅ Export the Express app for Vercel (⚠️ Important for deployment)
-export default app;  make for vercell and localhost both access 
+export default app;
