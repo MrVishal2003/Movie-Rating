@@ -11,16 +11,11 @@ import adminRoute from "./routes/admin.js";
 dotenv.config(); // Load environment variables
 
 const app = express();
-
 app.use(express.json());
-app.use(
-  cors({
-    origin: "*",  // Allow all origins (for testing)
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
+
+// ✅ Dynamic CORS Configuration
+const allowedOrigins = ["https://movie-rating-ui.vercel.app"]; // Replace this URL
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 app.use("/admin", adminRoute);
 
