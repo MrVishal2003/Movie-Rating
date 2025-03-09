@@ -117,6 +117,7 @@ app.get("/api/authenticated", verifyToken, (req, res) => {
   res.json({ authenticated: true, user: req.user });
 });
 
+
 // ✅ Fetch Ratings API
 app.get("/ratings", async (req, res) => {
   try {

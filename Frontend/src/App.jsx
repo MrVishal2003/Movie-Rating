@@ -18,15 +18,16 @@ function App() {
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if user is authenticated when component mounts
-    axios.get('/api/authenticated')
+    axios.get('https://backend-seven-kappa-97.vercel.app/api/authenticated', { withCredentials: true })
       .then(response => {
         setAuthenticated(response.data.authenticated);
       })
       .catch(error => {
         console.error('Error checking authentication:', error);
+        setAuthenticated(false); // Ensure it remains false on error
       });
   }, []);
+  
 
   const isAdminPage = window.location.pathname.startsWith('/admin');
 
